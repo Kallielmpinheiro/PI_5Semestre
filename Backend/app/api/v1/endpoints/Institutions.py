@@ -1393,17 +1393,17 @@ async def dashboard(institution_id: int, session: Session, ):
     for v in recent_visits.scalars():
         activy_recents.append({
             "type": "visit",
-            "description": f"Visita {v.type_of_visit} para família {v.family_id}",
+            "description": f"Visita {v.type_of_visit} para família {v.family.name} para sua avaliação de {v.type_of_visit}",
             "date": v.created.isoformat()
         })
     for d in recent_deliveries.scalars():
         activy_recents.append({
             "type": "delivery",
-            "description": f"Entrega para família {d.family_id}",
+            "description": f"Entrega para família {d.family.name} em {d.delivery_date.isoformat()}",
             "date": d.created.isoformat()
         })
     activy_recents.sort(key=lambda x: x["date"], reverse=True)
-    activy_recents = activy_recents[:10]
+    activy_recents = activy_recents[:5]
 
     stock_query = select(StockItem).where(
         StockItem.institution_id == institution.id,
