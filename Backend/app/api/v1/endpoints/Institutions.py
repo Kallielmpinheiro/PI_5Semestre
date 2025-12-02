@@ -1401,7 +1401,7 @@ async def dashboard(institution_id: int, session: Session, ):
         family_name = d.family.name if d.family else "Desconhecida"
         activy_recents.append({
             "type": "delivery",
-            "description": f"Entrega para família {family_name} em {d.delivery_date}",
+            "description": f"Entrega para família {family_name}",
             "date": d.created.isoformat()
         })
     activy_recents.sort(key=lambda x: x["date"], reverse=True)
