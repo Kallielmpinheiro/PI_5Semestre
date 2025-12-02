@@ -1380,26 +1380,28 @@ async def dashboard(institution_id: int, session: Session, ):
     products_instock_count = products_instock.scalar_one()
 
     recent_visits = await session.execute(
-        select(InstitutionVisitation).where(
+        select(InstitutionVisitation).options(selectinload(InstitutionVisitation.family)).where(
             InstitutionVisitation.institution_id == institution.id
         ).order_by(InstitutionVisitation.created.desc()).limit(5)
     )
     recent_deliveries = await session.execute(
-        select(FamilyDelivery).where(
+        select(FamilyDelivery).options(selectinload(FamilyDelivery.family)).where(
             FamilyDelivery.institution_id == institution.id
         ).order_by(FamilyDelivery.created.desc()).limit(5)
     )
     activy_recents = []
     for v in recent_visits.scalars():
+        family_name = v.family.name if v.family else "Desconhecida"
         activy_recents.append({
             "type": "visit",
-            "description": f"Visita {v.type_of_visit} para família {v.family.name} para sua avaliação de {v.type_of_visit}",
+            "description": f"Visita {v.type_of_visit.value if hasattr(v.type_of_visit, 'value') else v.type_of_visit} para família {family_name}",
             "date": v.created.isoformat()
         })
     for d in recent_deliveries.scalars():
+        family_name = d.family.name if d.family else "Desconhecida"
         activy_recents.append({
             "type": "delivery",
-            "description": f"Entrega para família {d.family.name} em {d.delivery_date.isoformat()}",
+            "description": f"Entrega para família {family_name} em {d.delivery_date}",
             "date": d.created.isoformat()
         })
     activy_recents.sort(key=lambda x: x["date"], reverse=True)
